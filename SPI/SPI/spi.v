@@ -44,19 +44,19 @@ module spi(
             count = 0;
             sda_sampling = 0;
         end
-        else if(sda_sampling)
-            sda_sampling = 0;
         else begin
             if(!cs) begin
                 if(count < SCL_PSC - 1) begin
                     count = count + 1;
-                    if(count < SCL_PSC / 2) begin
+                    if(count < SCL_PSC / 2)
                         scl = 0;
-                        if(count == SCL_PSC / 4)
-                            sda_sampling = 1;
-                    end
+
                     else
                         scl = 1;
+                    if(count == SCL_PSC / 4)
+                        sda_sampling = 1;
+                    else
+                        sda_sampling = 0;
                 end
                 else begin
                     count = 0;
@@ -90,7 +90,7 @@ module spi(
             waiting_p = 0;
     end
     
-    reg [$clog2(SCL_PSC)-1 : 0] wait_cnt;
+    reg [$clog2(WAIT_FOR_VALID)-1 : 0] wait_cnt;
     reg waiting;
     always @(posedge clk, posedge reset) begin
         if(reset) begin
@@ -98,20 +98,21 @@ module spi(
             wait_cnt = 0;
             waiting = 0;
         end
-        else if(waiting_p)
-            waiting = 1;
-        else if(waiting) begin
-            if(wait_cnt < WAIT_FOR_VALID - 1)
-                wait_cnt = wait_cnt + 1;
-            else begin
-                wait_cnt = 0;
-                waiting = 0;
-                valid = 1;
+        else if(valid)
+            valid = 0;
+        else begin
+            if(waiting_p)
+                waiting = 1;
+            if(waiting) begin
+                if(wait_cnt < WAIT_FOR_VALID - 1)
+                    wait_cnt = wait_cnt + 1;
+                else begin
+                    wait_cnt = 0;
+                    waiting = 0;
+                    valid = 1;
+                end
             end
         end
-        else
-            valid = 0;
     end
     
 endmodule
-

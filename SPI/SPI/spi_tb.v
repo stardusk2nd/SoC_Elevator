@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module scl_tb();
+module spi_tb();
 
     reg clk, reset, onoff;
     reg [7:0] data_in = 8'b11100010;
@@ -38,7 +38,7 @@ module scl_tb();
         reset = 0;
         
         onoff = 1;
-        #2000;
+        #10000;
         onoff = 0;
         #1000;
         $finish;

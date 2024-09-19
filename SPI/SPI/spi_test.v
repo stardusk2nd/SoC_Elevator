@@ -24,8 +24,7 @@ module spi_test(
     input clk, reset,
     input [3:0] btn,
     output cs, scl, sda,
-    output reg dc,
-    output reg lcd_reset
+    output reg dc
     );
     
     reg onoff;
@@ -35,14 +34,20 @@ module spi_test(
         clk, reset, onoff, data_in, cs, scl, sda, valid
     );
     
-    parameter IDLE = 0;
-    parameter INIT = 1;
-    parameter RESET = 2;
-    parameter SLEEP_OUT = 3;
-    parameter DISP_OFF = 4;
-    parameter DISP_ON = 5;
+    parameter IDLE          = 0,
+              SLEEP_OUT     = 1,
+              DISPLAY_ON    = 2,
+              COLMOD1       = 3,
+              COLMOD2       = 4,
+              MEMORY_WRITE  = 5,
+              SEND_RED1     = 6,
+              SEND_RED2     = 7,
+              SEND_GREEN1   = 8,
+              SEND_GREEN2   = 9,
+              SEND_BLUE1    = 10,
+              SEND_BLUE2    = 11;
     
-    reg [2:0] state, next_state;
+    reg [3:0] state, next_state;
     always @(negedge clk, posedge reset) begin
         if(reset)
             state = IDLE;
@@ -54,7 +59,6 @@ module spi_test(
     btn_debouncer btn_debouncer_inst[3:0](clk, reset, btn, btn_nedge);
     
     reg init;
-    reg [22:0] init_cnt;
     always @(posedge clk, posedge reset) begin
         if(reset) begin
             next_state = IDLE;
@@ -62,81 +66,131 @@ module spi_test(
             dc = 0;
             data_in = 0;
             init = 0;
-            init_cnt = 0;
-            lcd_reset = 1;
         end
         else begin
             case(state)
                 IDLE: begin
                     if(!init) begin
-                        next_state = INIT;
-                    end
-                    else if(btn_nedge[0]) begin
-                        onoff = 1;
-                        next_state = RESET;
-                    end
-                    else if(btn_nedge[1]) begin
                         onoff = 1;
                         next_state = SLEEP_OUT;
                     end
-                    else if(btn_nedge[2]) begin
-                        onoff = 1;
-                        next_state = DISP_OFF;
-                    end
-                    else if(btn_nedge[3]) begin
-                        onoff = 1;
-                        next_state = DISP_ON;
-                    end
-                end
-                INIT: begin
-                    if(init_cnt < 50_000_00 - 1) begin
-                        init_cnt = init_cnt + 1;
-                        lcd_reset = 0;
-                    end
                     else begin
-                        lcd_reset = 1;
-                        init = 1;
-                        next_state = IDLE;
-                    end
-                end
-                RESET: begin
-                    if(valid) begin
-                        next_state = IDLE;
-                        onoff = 0;
-                    end
-                    else begin
-                        data_in = 8'h01;
-                        dc = 0;
+                        if(btn_nedge[0]) begin
+                            onoff = 1;
+                            next_state = MEMORY_WRITE;
+                        end
+                        else if(btn[1]) begin
+                            onoff = 1;
+                            next_state = SEND_RED1;
+                        end
+                        else if(btn[2]) begin
+                            onoff = 1;
+                            next_state = SEND_GREEN1;
+                        end
+                        else if(btn[3]) begin
+                            onoff = 1;
+                            next_state = SEND_BLUE1;
+                        end
                     end
                 end
                 SLEEP_OUT: begin
                     if(valid) begin
-                        next_state = IDLE;
-                        onoff = 0;
+                        next_state = DISPLAY_ON;
                     end
                     else begin
                         data_in = 8'h11;
                         dc = 0;
                     end
                 end
-                DISP_OFF: begin
+                DISPLAY_ON: begin
                     if(valid) begin
-                        next_state = IDLE;
-                        onoff = 0;
-                    end
-                    else begin
-                        data_in = 8'h28;
-                        dc = 0;
-                    end
-                end
-                DISP_ON: begin
-                    if(valid) begin
-                        next_state = IDLE;
-                        onoff = 0;
+                        next_state = COLMOD1;
                     end
                     else begin
                         data_in = 8'h29;
+                    end
+                end
+                COLMOD1: begin
+                    if(valid) begin
+                        next_state = COLMOD2;
+                    end
+                    else begin
+                        data_in = 8'h3A;
+                    end
+                end
+                COLMOD2: begin
+                    if(valid) begin
+                        onoff = 0;
+                        init = 1;
+                        next_state = IDLE;
+                    end
+                    else begin
+                        data_in = 8'h55;
+                        dc = 1;
+                    end
+                end
+                MEMORY_WRITE: begin
+                    if(valid) begin
+                        onoff = 0;
+                        next_state = IDLE;
+                    end
+                    else begin
+                        data_in = 8'h2C;
                         dc = 0;
+                    end
+                end
+                SEND_RED1: begin
+                    if(valid) begin
+                        next_state = SEND_RED2;
+                    end
+                    else begin
+                        data_in = 8'b1111_1000;
+                        dc = 1;
+                    end
+                end
+                SEND_RED2: begin
+                    if(valid) begin
+                        onoff = 0;
+                        next_state = IDLE;
+                    end
+                    else begin
+                        data_in = 8'b0;
+                    end
+                end
+                SEND_GREEN1: begin
+                    if(valid) begin
+                        next_state = SEND_GREEN2;
+                    end
+                    else begin
+                        data_in = 8'b0000_0111;
+                        dc = 1;
+                    end
+                end
+                SEND_GREEN2: begin
+                    if(valid) begin
+                        onoff = 0;
+                        next_state = IDLE;
+                    end
+                    else begin
+                        data_in = 8'b1110_0000;
+                    end
+                end
+                SEND_BLUE1: begin
+                    if(valid) begin
+                        next_state = SEND_BLUE2;
+                    end
+                    else begin
+                        data_in = 8'b0;
+                        dc = 1;
+                    end
+                end
+                SEND_BLUE2: begin
+                    if(valid) begin
+                        onoff = 0;
+                        next_state = IDLE;
+                    end
+                    else begin
+                        data_in = 8'b0001_1111;
                     end
                 end
             endcase
