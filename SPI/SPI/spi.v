@@ -31,7 +31,7 @@ module spi(
     output reg valid
     );
     
-    parameter SCL_FREQ = 1_000_000; // Maximum frequency of SCL: 6.67MHz
+    parameter SCL_FREQ = 3_000_000; // Maximum frequency of SCL: 6.67MHz
     parameter integer SCL_PSC = `CLK_FREQ / SCL_FREQ;   // Prescaler for clock divider
     parameter integer WAIT_FOR_VALID = SCL_PSC * 0.9;
     
