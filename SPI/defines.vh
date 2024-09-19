@@ -1,0 +1,2 @@
+
+`define CLK_FREQ 100_000_000
