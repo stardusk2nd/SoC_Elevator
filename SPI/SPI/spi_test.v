@@ -40,12 +40,14 @@ module spi_test(
               COLMOD1       = 3,
               COLMOD2       = 4,
               MEMORY_WRITE  = 5,
-              SEND_RED1     = 6,
-              SEND_RED2     = 7,
-              SEND_GREEN1   = 8,
-              SEND_GREEN2   = 9,
-              SEND_BLUE1    = 10,
-              SEND_BLUE2    = 11;
+              SEND_BLANK1   = 6,
+              SEND_BLANK2   = 7,
+              SEND_RED1     = 8,
+              SEND_RED2     = 9,
+              SEND_GREEN1   = 10,
+              SEND_GREEN2   = 11,
+              SEND_BLUE1    = 12,
+              SEND_BLUE2    = 13;
     
     reg [3:0] state, next_state;
     always @(negedge clk, posedge reset) begin
@@ -54,9 +56,6 @@ module spi_test(
         else
             state = next_state;
     end
-    
-    wire [3:0] btn_nedge;
-    btn_debouncer btn_debouncer_inst[3:0](clk, reset, btn, btn_nedge);
     
     reg init;
     always @(posedge clk, posedge reset) begin
@@ -75,9 +74,9 @@ module spi_test(
                         next_state = SLEEP_OUT;
                     end
                     else begin
-                        if(btn_nedge[0]) begin
+                        if(btn[0]) begin
                             onoff = 1;
-                            next_state = MEMORY_WRITE;
+                            next_state = SEND_BLANK1;
                         end
                         else if(btn[1]) begin
                             onoff = 1;
@@ -120,9 +119,7 @@ module spi_test(
                 end
                 COLMOD2: begin
                     if(valid) begin
-                        onoff = 0;
-                        init = 1;
-                        next_state = IDLE;
+                        next_state = MEMORY_WRITE;
                     end
                     else begin
                         data_in = 8'h55;
@@ -132,11 +129,34 @@ module spi_test(
                 MEMORY_WRITE: begin
                     if(valid) begin
                         onoff = 0;
+                        init = 1;
                         next_state = IDLE;
                     end
                     else begin
                         data_in = 8'h2C;
                         dc = 0;
+                    end
+                end
+                SEND_BLANK1: begin
+                    if(valid) begin
+                        next_state = SEND_BLANK2;
+                    end
+                    else begin
+                        data_in = 8'b0;
+                        dc = 1;
+                    end
+                end
+                SEND_BLANK2: begin
+                    if(valid) begin
+                        if(btn[1])
+                            next_state = SEND_BLANK1;
+                        else begin
+                            onoff = 0;
+                            next_state = IDLE;
+                        end 
+                    end
+                    else begin
+                        data_in = 8'b0;
                     end
                 end
                 SEND_RED1: begin
@@ -150,8 +170,12 @@ module spi_test(
                 end
                 SEND_RED2: begin
                     if(valid) begin
-                        onoff = 0;
-                        next_state = IDLE;
+                        if(btn[1])
+                            next_state = SEND_RED1;
+                        else begin
+                            onoff = 0;
+                            next_state = IDLE;
+                        end 
                     end
                     else begin
                         data_in = 8'b0;
@@ -168,11 +192,15 @@ module spi_test(
                 end
                 SEND_GREEN2: begin
                     if(valid) begin
-                        onoff = 0;
-                        next_state = IDLE;
+                        if(btn[2])
+                            next_state = SEND_GREEN1;
+                        else begin
+                            onoff = 0;
+                            next_state = IDLE;
+                        end 
                     end
                     else begin
-                        data_in = 8'b1110_0000;
+                        data_in = 8'b1110_000;
                     end
                 end
                 SEND_BLUE1: begin
@@ -186,8 +214,12 @@ module spi_test(
                 end
                 SEND_BLUE2: begin
                     if(valid) begin
-                        onoff = 0;
-                        next_state = IDLE;
+                        if(btn[3])
+                            next_state = SEND_BLUE1;
+                        else begin
+                            onoff = 0;
+                            next_state = IDLE;
+                        end 
                     end
                     else begin
                         data_in = 8'b0001_1111;

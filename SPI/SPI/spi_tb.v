@@ -38,7 +38,7 @@ module spi_tb();
         reset = 0;
         
         onoff = 1;
-        #10000;
+        #5000;
         onoff = 0;
         #1000;
         $finish;
