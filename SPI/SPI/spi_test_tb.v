@@ -32,18 +32,27 @@ module spi_test_tb();
         forever #5 clk = ~clk;
     end
     
-    integer i;
+//    integer i;
     initial begin
         reset = 1;
         #10;
         reset = 0;
+        #5000;
         
-        for(i = 0; i < 4; i = i + 1) begin
-            btn[i] = 1;
-            #10;
-            btn[i] = 0;
-            #10000;
-        end
+//        btn[0] = 1;
+//        #10;
+//        btn[0] = 0;
+//        #3000;
+        
+//        btn[1] = 1;
+//        #20000;
+        
+//        for(i = 0; i < 4; i = i + 1) begin
+//            btn[i] = 1;
+//            #10;
+//            btn[i] = 0;
+//            #10000;
+//        end
         
         $finish;
     end
