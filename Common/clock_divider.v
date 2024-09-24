@@ -22,6 +22,7 @@
 
 module clock_divider #(parameter N = 1000)(
     input clk, reset,
+    input enable,
     output reg div_edge
     );
     
@@ -31,13 +32,19 @@ module clock_divider #(parameter N = 1000)(
             count = 0;
             div_edge = 0;
         end
-        else if(count < N - 1) begin
-            count = count + 1;
-            div_edge = 0;
+        else if(enable)begin
+            if(count < N - 1) begin
+                count = count + 1;
+                div_edge = 0;
+            end
+            else begin
+                count = 0;
+                div_edge = 1;
+            end
         end
         else begin
             count = 0;
-            div_edge = 1;
+            div_edge = 0;
         end
     end
 
