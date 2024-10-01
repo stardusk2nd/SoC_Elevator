@@ -23,17 +23,19 @@
 module timer_counter_tb();
 
     reg clk, reset;
-    reg [1:0] control;
-    reg [15:0] compare, max_count;
-    wire signal;
+    reg [5:0] control;
+    reg [31:0] prescalor, compare, max_count;
+    wire timer_out0, timer_out1, timer_out2, timer_out3;
     
-    timer_counter uut(clk, reset, control, max_count, compare, signal);
+    timer_counter dut(clk, reset, control, prescalor, max_count, compare,
+                      timer_out0, timer_out1, timer_out2, timer_out3);
     
     initial begin
         clk = 0;
         reset = 1;
-        max_count = 1000;
-        compare = 250;
+        max_count = 999;
+        compare = 999;
+        prescalor = 999;
         forever #5 clk = ~clk;
     end
     
@@ -41,17 +43,17 @@ module timer_counter_tb();
         #10;
         reset = 0;
         
-        control = 2'b00;
-        #1000;
+        control = 6'b000101;
+        #10000000;
         
-        control = 2'b01;
-        #97500;
+        control = 6'b001001;
+        #10000000;
         
-        control = 2'b10;
-        #100000;
+        control = 6'b010001;
+        #10000000;
         
-        control = 2'b11;
-        #10000;
+        control = 6'b100001;
+        #10000000;
         $finish;
     end
 
