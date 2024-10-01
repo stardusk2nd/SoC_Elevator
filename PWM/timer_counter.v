@@ -45,20 +45,168 @@
 
 //endmodule
 
+//module timer_counter(
+//    input clk, reset,
+//    input [5:0] control,
+//    input [31:0] prescalor,
+//    input [31:0] max_count,
+//    input [31:0] compare,
+//    output reg timer_out0,
+//    output reg timer_out1,
+//    output reg timer_out2,
+//    output reg timer_out3
+//    );
+    
+//    wire [1:0] mode = control[1:0];
+//    wire [3:0] channel = control[5:2];
+//    reg [1:0] prev_mode;
+    
+//    reg [31:0] cnt_pres, count;
+//    always @(posedge clk, posedge reset) begin
+//        if(reset) begin
+//            cnt_pres = 0;
+//            count = 0;
+//            timer_out0 = 0;
+//            timer_out1 = 0;
+//            timer_out2 = 0;
+//            timer_out3 = 0;
+//            prev_mode = 0;
+//        end
+//        else begin
+//            if(prev_mode != mode) begin
+//                cnt_pres = 0;
+//                count = 0;
+//                timer_out0 = 0;
+//                timer_out1 = 0;
+//                timer_out2 = 0;
+//                timer_out3 = 0;
+//                prev_mode = mode;
+//            end
+//            // int
+//            if(mode == 2'b01) begin
+//                if(channel[0])begin
+//                    if(cnt_pres < prescalor)
+//                        cnt_pres = cnt_pres + 1;
+//                    else begin
+//                        cnt_pres = 0;
+//                        if(count < max_count) begin
+//                            count = count + 1;
+//                            timer_out0 = 0;
+//                        end
+//                        else begin
+//                            count = 0;
+//                            timer_out0 = 1;
+//                        end
+//                    end
+//                end
+//                else if(channel[1])begin
+//                    if(cnt_pres < prescalor)
+//                        cnt_pres = cnt_pres + 1;
+//                    else begin
+//                        cnt_pres = 0;
+//                        if(count < max_count) begin
+//                            count = count + 1;
+//                            timer_out1 = 0;
+//                        end
+//                        else begin
+//                            count = 0;
+//                            timer_out1 = 1;
+//                        end
+//                    end
+//                end
+//                else if(channel[2])begin
+//                    if(cnt_pres < prescalor)
+//                        cnt_pres = cnt_pres + 1;
+//                    else begin
+//                        cnt_pres = 0;
+//                        if(count < max_count) begin
+//                            count = count + 1;
+//                            timer_out2 = 0;
+//                        end
+//                        else begin
+//                            count = 0;
+//                            timer_out2 = 1;
+//                        end
+//                    end
+//                end
+//                else if(channel[3])begin
+//                    if(cnt_pres < prescalor)
+//                        cnt_pres = cnt_pres + 1;
+//                    else begin
+//                        cnt_pres = 0;
+//                        if(count < max_count) begin
+//                            count = count + 1;
+//                            timer_out3 = 0;
+//                        end
+//                        else begin
+//                            count = 0;
+//                            timer_out3 = 1;
+//                        end
+//                    end
+//                end
+//                else begin
+//                    timer_out0 = 0;
+//                    timer_out1 = 0;
+//                    timer_out2 = 0;
+//                    timer_out3 = 0;
+//                end
+//            end
+//            else if(mode == 2'b10) begin
+//                if(cnt_pres < prescalor)
+//                    cnt_pres = cnt_pres + 1;
+//                else begin
+//                    cnt_pres = 0;
+//                    if(count < max_count)
+//                        count = count + 1;
+//                    else
+//                        count = 0;
+//                    if(channel[0])begin
+//                        if(count < compare)
+//                            timer_out0 = 1;
+//                        else
+//                            timer_out0 = 0;
+//                    end
+//                    else if(channel[1])begin
+//                        if(count < compare)
+//                            timer_out1 = 1;
+//                        else
+//                            timer_out1 = 0;
+//                    end
+//                    else if(channel[2])begin
+//                        if(count < compare)
+//                            timer_out2 = 1;
+//                        else
+//                            timer_out2 = 0;
+//                    end
+//                    else if(channel[3])begin
+//                        if(count < compare)
+//                            timer_out3 = 1;
+//                        else
+//                            timer_out3 = 0;
+//                    end
+//                    else begin
+//                        timer_out0 = 0;
+//                        timer_out1 = 0;
+//                        timer_out2 = 0;
+//                        timer_out3 = 0;
+//                    end
+//                end
+//            end
+//        end
+//    end
+    
+//endmodule
+
 module timer_counter(
     input clk, reset,
-    input [5:0] control,
+    input [1:0] control,
     input [31:0] prescalor,
     input [31:0] max_count,
     input [31:0] compare,
-    output reg timer_out0,
-    output reg timer_out1,
-    output reg timer_out2,
-    output reg timer_out3
+    output reg int, pwm
     );
     
     wire [1:0] mode = control[1:0];
-    wire [3:0] channel = control[5:2];
     reg [1:0] prev_mode;
     
     reg [31:0] cnt_pres, count;
@@ -66,130 +214,46 @@ module timer_counter(
         if(reset) begin
             cnt_pres = 0;
             count = 0;
-            timer_out0 = 0;
-            timer_out1 = 0;
-            timer_out2 = 0;
-            timer_out3 = 0;
+            int = 0;
+            pwm = 0;
             prev_mode = 0;
         end
         else begin
             if(prev_mode != mode) begin
                 cnt_pres = 0;
                 count = 0;
-                timer_out0 = 0;
-                timer_out1 = 0;
-                timer_out2 = 0;
-                timer_out3 = 0;
+                int = 0;
+                pwm = 0;
                 prev_mode = mode;
             end
             // int
             if(mode == 2'b01) begin
-                if(channel[0])begin
-                    if(cnt_pres < prescalor)
-                        cnt_pres = cnt_pres + 1;
-                    else begin
-                        cnt_pres = 0;
-                        if(count < max_count) begin
-                            count = count + 1;
-                            timer_out0 = 0;
-                        end
-                        else begin
-                            count = 0;
-                            timer_out0 = 1;
-                        end
-                    end
-                end
-                else if(channel[1])begin
-                    if(cnt_pres < prescalor)
-                        cnt_pres = cnt_pres + 1;
-                    else begin
-                        cnt_pres = 0;
-                        if(count < max_count) begin
-                            count = count + 1;
-                            timer_out1 = 0;
-                        end
-                        else begin
-                            count = 0;
-                            timer_out1 = 1;
-                        end
-                    end
-                end
-                else if(channel[2])begin
-                    if(cnt_pres < prescalor)
-                        cnt_pres = cnt_pres + 1;
-                    else begin
-                        cnt_pres = 0;
-                        if(count < max_count) begin
-                            count = count + 1;
-                            timer_out2 = 0;
-                        end
-                        else begin
-                            count = 0;
-                            timer_out2 = 1;
-                        end
-                    end
-                end
-                else if(channel[3])begin
-                    if(cnt_pres < prescalor)
-                        cnt_pres = cnt_pres + 1;
-                    else begin
-                        cnt_pres = 0;
-                        if(count < max_count) begin
-                            count = count + 1;
-                            timer_out3 = 0;
-                        end
-                        else begin
-                            count = 0;
-                            timer_out3 = 1;
-                        end
-                    end
-                end
-                else begin
-                    timer_out0 = 0;
-                    timer_out1 = 0;
-                    timer_out2 = 0;
-                    timer_out3 = 0;
-                end
-            end
-            else if(mode == 2'b10) begin
                 if(cnt_pres < prescalor)
-                    cnt_pres = cnt_pres + 1;
+                    cnt_pres = cnt_pres + 1;     
                 else begin
                     cnt_pres = 0;
+                    if(count < max_count) begin
+                        count = count + 1;
+                        int = 0;
+                    end
+                    else begin
+                        count = 0;
+                        int = 1;
+                    end
+                end
+            end           
+            else if(mode == 2'b10) begin
+                if(cnt_pres)
+                    cnt_pres = cnt_pres + 1;
+                else begin
                     if(count < max_count)
                         count = count + 1;
                     else
                         count = 0;
-                    if(channel[0])begin
-                        if(count < compare)
-                            timer_out0 = 1;
-                        else
-                            timer_out0 = 0;
-                    end
-                    else if(channel[1])begin
-                        if(count < compare)
-                            timer_out1 = 1;
-                        else
-                            timer_out1 = 0;
-                    end
-                    else if(channel[2])begin
-                        if(count < compare)
-                            timer_out2 = 1;
-                        else
-                            timer_out2 = 0;
-                    end
-                    else if(channel[3])begin
-                        if(count < compare)
-                            timer_out3 = 1;
-                        else
-                            timer_out3 = 0;
-                    end
-                    else begin
-                        timer_out0 = 0;
-                        timer_out1 = 0;
-                        timer_out2 = 0;
-                        timer_out3 = 0;
-                    end
+                    if(count < compare)
+                        pwm = 1;
+                    else
+                        pwm = 0;
                 end
             end
         end
