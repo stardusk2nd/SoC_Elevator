@@ -22,26 +22,80 @@
 
 module spi_tx_ip(
     input clk, reset,
-    input [15:0] data_in,
-    output cs, scl, sda,
-    output reg dc
+    input [7:0] data_in,    // 1-byte data to send
+    input [7:0] prescalor,  // prescalor for scl clock generating
+    input cs,               // on/off control signal (active-low)
+    output reg scl,         // spi clock pin
+    output reg sda,         // spi data pin (tx, master to slave)
+    output reg valid        // end of communication signal
     );
     
-    wire [7:0] data_buffer;
-    wire onoff, valid;
-    spi_tx spi_inst(
-        .clk(clk), .reset(reset),
-        .onoff(onoff),
-        .data_in(data_buffer),
-        .cs(cs), .scl(scl), .sda(sda),
-        .valid(valid)
-    );
-    
+    // count for clock divider
+    reg [7:0] count;
+    // timing for loading the data_in onto the sda, one bit at a time
+    reg sda_sampling;
     always @(posedge clk, posedge reset) begin
         if(reset) begin
-            dc = 0;
+            scl = 0;
+            count = 0;
+            sda_sampling = 0;
         end
         else begin
+            if(!cs) begin
+                if(count < prescalor) begin
+                    count = count + 1;
+                    if(count <= prescalor >> 1)
+                        scl = 0;
+                    else
+                        scl = 1;
+                    if(count == prescalor >> 2)
+                        sda_sampling = 1;
+                    else
+                        sda_sampling = 0;
+                end
+                else begin
+                    count = 0;
+                    scl = 0;
+                end
+            end
+        end
+    end
+    
+    wire scl_n;
+    edge_detector edge_detector_inst(
+        .clk(clk), .reset(reset), .cp(scl),
+        .pedge(scl_p), .nedge()
+    );
+    
+    /* send 1-byte */
+    reg [2:0] index;
+    reg waiting;
+    always @(posedge clk, posedge reset) begin
+        if(reset) begin
+            sda = 0;
+            // sending sequence from HSB -> LSB
+            index = 7;
+            waiting = 0;
+            valid = 0;
+        end
+        else if(valid)
+            valid = 0;
+        else begin
+            // send 1-bit at 'sda_sampling'
+            if(!cs && sda_sampling) begin
+                sda = data_in[index];
+                if(index > 0)
+                    index = index - 1;
+                else begin
+                    index = 7;
+                    waiting = 1;
+                end
+            end
+            // wait until last bit sended
+            if(waiting && count == scl_p) begin
+                waiting = 0;
+                valid = 1;
+            end
         end
     end
     

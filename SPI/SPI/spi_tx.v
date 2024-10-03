@@ -24,19 +24,21 @@
 
 module spi_tx(
     input clk, reset,
-    input [7:0] data_in,
-    input cs,
-    output reg scl, sda,
-    output reg valid
+    input [7:0] data_in,// 1-byte data to send
+    input cs,           // on/off control signal (active-low)
+    output reg scl,     // spi clock pin
+    output reg sda,     // spi data pin (tx, master to slave)
+    output reg valid    // end of communication signal
     );
     
-    parameter SCL_FREQ = 15_000_000; // 15MHz
-    parameter integer SCL_PSC = `CLK_FREQ / SCL_FREQ;   // Prescaler for clock divider
-    parameter integer WAIT_FOR_VALID = SCL_PSC * 0.9;
+    parameter SCL_FREQ = 15_000_000;                    // frequency of scl: 15MHz
+    parameter integer SCL_PSC = `CLK_FREQ / SCL_FREQ;   // prescaler for clock divider, generating 'scl'
     
-    /* Generate 'SCL_FREQ'Hz SCL */
-    // cpol = 0, cpha = 0
+    /* Generate 'SCL_FREQ'Hz SCL
+       cpol(phase) = 0, cpha(polarity) = 0 */
+    // width of count, for clock divider
     reg [$clog2(SCL_PSC)-1 : 0] count;
+    // timing for loading the data_in onto the sda, one bit at a time
     reg sda_sampling;
     always @(posedge clk, posedge reset) begin
         if(reset) begin
@@ -65,11 +67,13 @@ module spi_tx(
         end
     end
     
+    /* send 1-byte */
     reg [2:0] index;
     reg waiting;
     always @(posedge clk, posedge reset) begin
         if(reset) begin
             sda = 0;
+            // sending sequence from HSB -> LSB
             index = 7;
             waiting = 0;
             valid = 0;
@@ -77,6 +81,7 @@ module spi_tx(
         else if(valid)
             valid = 0;
         else begin
+            // send 1-bit at 'sda_sampling'
             if(!cs && sda_sampling) begin
                 sda = data_in[index];
                 if(index > 0)
@@ -86,7 +91,8 @@ module spi_tx(
                     waiting = 1;
                 end
             end
-            if(waiting && count == WAIT_FOR_VALID) begin
+            // wait until last bit sended
+            if(waiting && count == 3 * SCL_PSC / 4) begin
                 waiting = 0;
                 valid = 1;
             end
