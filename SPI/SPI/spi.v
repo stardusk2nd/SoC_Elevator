@@ -24,9 +24,8 @@
 
 module spi(
     input clk, reset,
-    input onoff,
     input [7:0] data_in,
-    output cs,
+    input cs,
     output reg scl, sda,
     output reg valid
     );
@@ -36,6 +35,7 @@ module spi(
     parameter integer WAIT_FOR_VALID = SCL_PSC * 0.9;
     
     /* Generate 'SCL_FREQ'Hz SCL */
+    // cpol = 0, cpha = 0
     reg [$clog2(SCL_PSC)-1 : 0] count;
     reg sda_sampling;
     always @(posedge clk, posedge reset) begin
@@ -65,51 +65,30 @@ module spi(
         end
     end
     
-    assign cs = ~onoff;
-    
     reg [2:0] index;
-    reg waiting_p;
+    reg waiting;
     always @(posedge clk, posedge reset) begin
         if(reset) begin
             sda = 0;
             index = 7;
-            waiting_p = 0;
-        end
-        else if(!cs && sda_sampling) begin
-            sda = data_in[index];
-            if(index > 0) begin
-                index = index - 1;
-            end
-            else begin
-                index = 7;
-                waiting_p = 1;
-            end
-        end
-        else
-            waiting_p = 0;
-    end
-    
-    reg [$clog2(WAIT_FOR_VALID)-1 : 0] wait_cnt;
-    reg waiting;
-    always @(posedge clk, posedge reset) begin
-        if(reset) begin
-            valid = 0;
-            wait_cnt = 0;
             waiting = 0;
+            valid = 0;
         end
         else if(valid)
             valid = 0;
         else begin
-            if(waiting_p)
-                waiting = 1;
-            if(waiting) begin
-                if(wait_cnt < WAIT_FOR_VALID - 1)
-                    wait_cnt = wait_cnt + 1;
+            if(!cs && sda_sampling) begin
+                sda = data_in[index];
+                if(index > 0)
+                    index = index - 1;
                 else begin
-                    wait_cnt = 0;
-                    waiting = 0;
-                    valid = 1;
+                    index = 7;
+                    waiting = 1;
                 end
+            end
+            if(waiting && count == WAIT_FOR_VALID) begin
+                waiting = 0;
+                valid = 1;
             end
         end
     end
