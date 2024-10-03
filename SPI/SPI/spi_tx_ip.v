@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module spi_lcd(
+module spi_tx_ip(
     input clk, reset,
     input [15:0] data_in,
     output cs, scl, sda,
@@ -29,7 +29,7 @@ module spi_lcd(
     
     wire [7:0] data_buffer;
     wire onoff, valid;
-    spi spi_inst(
+    spi_tx spi_inst(
         .clk(clk), .reset(reset),
         .onoff(onoff),
         .data_in(data_buffer),

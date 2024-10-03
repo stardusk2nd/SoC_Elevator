@@ -22,7 +22,7 @@
 
 `include "defines.vh"
 
-module spi(
+module spi_tx(
     input clk, reset,
     input [7:0] data_in,
     input cs,

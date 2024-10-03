@@ -29,7 +29,7 @@ module spi_test(
     
     reg [7:0] data_in;
     wire valid;
-    spi spi_inst(
+    spi_tx spi_inst(
         clk, reset, data_in, cs, scl, sda, valid
     );
     
