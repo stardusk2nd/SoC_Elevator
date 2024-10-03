@@ -61,7 +61,7 @@ module spi_tx_ip(
         end
     end
     
-    wire scl_n;
+    wire scl_p;
     edge_detector edge_detector_inst(
         .clk(clk), .reset(reset), .cp(scl),
         .pedge(scl_p), .nedge()
