@@ -59,7 +59,7 @@ XGpio gpio_instance0;	// motor
 XGpio gpio_instance1;	// btn
 XGpio gpio_instance2;	// photo
 
-volatile unsigned int *tim_reg;
+volatile unsigned int *tim_reg;		// timer register pointer
 
 int main()
 {
@@ -67,9 +67,9 @@ int main()
 
     /* timer/counter register init */
 	tim_reg = (volatile unsigned int *)TIMER_BASEADDR;
-	tim_reg[0] = 0b01;
-	tim_reg[1] = 999;
-	tim_reg[2] = 199;
+	tim_reg[0] = 0b01;	// 01 = timer mode, 10 = pwm mode
+	tim_reg[1] = 999;	// prescalor
+	tim_reg[2] = 199;	// max count value
 
 	/* gpio init */
 	XGpio_Config *cfg_ptr;
@@ -81,10 +81,11 @@ int main()
 	cfg_ptr = XGpio_LookupConfig(PHOTO_ID);
 	XGpio_CfgInitialize(&gpio_instance2, cfg_ptr, cfg_ptr->BaseAddress);
 
-	XGpio_SetDataDirection(&gpio_instance0, MOTOR_CH, 0);
-	XGpio_SetDataDirection(&gpio_instance1, BTN_CH, 0b1111);
-	XGpio_SetDataDirection(&gpio_instance2, PHOTO_CH, 0b111);
+	XGpio_SetDataDirection(&gpio_instance0, MOTOR_CH, 0);		// motor output
+	XGpio_SetDataDirection(&gpio_instance1, BTN_CH, 0b1111);	// button input
+	XGpio_SetDataDirection(&gpio_instance2, PHOTO_CH, 0b111);	// photo interrupt input
 
+	/* interrupt init */
 	IntInit();
 
     while(1){

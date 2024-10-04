@@ -1,17 +1,17 @@
 #include "functions.h"
 
-bool direction = false;
-bool start = false;
-uint8_t cur_floor = 1;
+bool direction = false;		// motor direction
+bool start = false;			// motor start
+uint8_t cur_floor = 2;
 uint8_t target_floor = 1;
 uint8_t i = 0;
 
 void RotateStep(){
 	if(!direction){
-		XGpio_DiscreteWrite(&gpio_instance0, MOTOR_CH, 0b0001 << i);
+		XGpio_DiscreteWrite(&gpio_instance0, MOTOR_CH, 0b0001 << i);	// down stair
 	}
 	else{
-		XGpio_DiscreteWrite(&gpio_instance0, MOTOR_CH, 0b1000 >> i);
+		XGpio_DiscreteWrite(&gpio_instance0, MOTOR_CH, 0b1000 >> i);	// up stair
 	}
 }
 

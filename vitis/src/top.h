@@ -7,6 +7,7 @@
 #include "xil_exception.h"
 #include "stdbool.h"
 
+/* define variable */
 #define MOTOR_CH 		1
 #define BTN_CH 			1
 #define PHOTO_CH 		1

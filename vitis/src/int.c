@@ -17,13 +17,13 @@ void BTN_ISR(void *CallBackRef){
 
 	uint8_t btn_state = XGpio_DiscreteRead(Gpio_ptr, BTN_CH);
 	if(btn_state == 0b0001){
-		target_floor = 1;
+		target_floor = 1;		// 1F
 	}
 	else if(btn_state == 0b0010){
-		target_floor = 2;
+		target_floor = 2;		// 2F
 	}
 	else if(btn_state == 0b0100){
-		target_floor = 3;
+		target_floor = 3;		// 3F
 	}
 	XGpio_InterruptClear(Gpio_ptr, BTN_CH);
 	return;
@@ -34,13 +34,13 @@ void PHOTO_ISR(void *CallBackRef){
 	uint8_t photo_state = XGpio_DiscreteRead(Gpio_ptr, PHOTO_CH);
 
 	if(photo_state == 0b001){
-		cur_floor = 1;
+		cur_floor = 1;		// 1F
 	}
 	else if(photo_state == 0b010){
-		cur_floor = 2;
+		cur_floor = 2;		// 2F
 	}
 	else if(photo_state == 0b100){
-		cur_floor = 3;
+		cur_floor = 3;		// 3F
 	}
 
 	XGpio_InterruptClear(Gpio_ptr, PHOTO_CH);

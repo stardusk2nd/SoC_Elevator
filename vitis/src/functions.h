@@ -1,4 +1,4 @@
 #include "top.h"
 
-void RotateStep();
-void CheckFloor();
+void RotateStep();		// motor drive function
+void CheckFloor();		// check elevator location
