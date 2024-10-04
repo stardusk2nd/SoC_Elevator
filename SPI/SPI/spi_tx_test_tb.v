@@ -20,12 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module spi_test_tb();
+module spi_tx_test_tb();
     
     reg clk, reset;
     reg [3:0] btn = 0;
     wire cs, scl, sda, dc;
-    spi_test uut(clk, reset, btn, cs, scl, sda, dc);
+    spi_test_tx uut(clk, reset, btn, cs, scl, sda, dc);
     
     initial begin
         clk = 0;

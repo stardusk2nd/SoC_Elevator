@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module spi_test(
+module spi_tx_test(
     input clk, reset,
     input [3:0] btn,
     output scl, sda,

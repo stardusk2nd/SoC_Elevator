@@ -25,7 +25,8 @@ module spi_tx_ip_top(
     input [7:0] data_in,
     output reg cs,
     output dc,
-    output scl, sda
+    output scl, sda,
+    output valid
     );
     
     /* control register */
@@ -35,7 +36,6 @@ module spi_tx_ip_top(
     assign dc = data_mode;
     
     /* spi module instane */
-    wire valid;
     spi_tx_ip spi_tx_ip_inst(clk, reset, data_in, prescalor, cs, scl, sda, valid);
     
     /* state machine control */
