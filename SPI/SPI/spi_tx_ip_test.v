@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2024/09/14 12:18:46
+// Create Date: 2024/10/03 11:45:33
 // Design Name: 
-// Module Name: spi_test
+// Module Name: spi_tx_ip_test
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,18 +20,18 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module spi_test(
+module spi_tx_ip_test(
     input clk, reset,
     input [3:0] btn,
-    output cs, scl, sda,
-    output reg dc
+    output scl, sda,
+    output reg cs, dc
     );
     
-    reg onoff;
     reg [7:0] data_in;
+    reg [7:0] prescalor = 9;
     wire valid;
-    spi spi_inst(
-        clk, reset, onoff, data_in, cs, scl, sda, valid
+    spi_tx_ip spi_inst(
+        clk, reset, data_in, prescalor, cs, scl, sda, valid
     );
     
     parameter IDLE          = 0,
@@ -61,7 +61,7 @@ module spi_test(
     always @(posedge clk, posedge reset) begin
         if(reset) begin
             next_state = IDLE;
-            onoff = 0;
+            cs = 1;
             dc = 0;
             data_in = 0;
             init = 0;
@@ -70,24 +70,24 @@ module spi_test(
             case(state)
                 IDLE: begin
                     if(!init) begin
-                        onoff = 1;
+                        cs = 0;
                         next_state = SLEEP_OUT;
                     end
                     else begin
                         if(btn[0]) begin
-                            onoff = 1;
+                            cs = 0;
                             next_state = SEND_BLANK1;
                         end
                         else if(btn[1]) begin
-                            onoff = 1;
+                            cs = 0;
                             next_state = SEND_RED1;
                         end
                         else if(btn[2]) begin
-                            onoff = 1;
+                            cs = 0;
                             next_state = SEND_GREEN1;
                         end
                         else if(btn[3]) begin
-                            onoff = 1;
+                            cs = 0;
                             next_state = SEND_BLUE1;
                         end
                     end
@@ -128,7 +128,7 @@ module spi_test(
                 end
                 MEMORY_WRITE: begin
                     if(valid) begin
-                        onoff = 0;
+                        cs = 1;
                         init = 1;
                         next_state = IDLE;
                     end
@@ -151,7 +151,7 @@ module spi_test(
                         if(btn[1])
                             next_state = SEND_BLANK1;
                         else begin
-                            onoff = 0;
+                            cs = 1;
                             next_state = IDLE;
                         end 
                     end
@@ -173,7 +173,7 @@ module spi_test(
                         if(btn[1])
                             next_state = SEND_RED1;
                         else begin
-                            onoff = 0;
+                            cs = 1;
                             next_state = IDLE;
                         end 
                     end
@@ -195,7 +195,7 @@ module spi_test(
                         if(btn[2])
                             next_state = SEND_GREEN1;
                         else begin
-                            onoff = 0;
+                            cs = 1;
                             next_state = IDLE;
                         end 
                     end
@@ -217,7 +217,7 @@ module spi_test(
                         if(btn[3])
                             next_state = SEND_BLUE1;
                         else begin
-                            onoff = 0;
+                            cs = 1;
                             next_state = IDLE;
                         end 
                     end
@@ -228,4 +228,5 @@ module spi_test(
             endcase
         end
     end
+    
 endmodule

@@ -20,12 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module spi_tb();
+module spi_tx_tb();
 
-    reg clk, reset, onoff;
+    reg clk, reset, cs;
     reg [7:0] data_in = 8'b11100010;
-    wire cs, scl, sda, valid;
-    spi uut(clk, reset, onoff, data_in, cs, scl, sda, valid);
+    wire scl, sda, valid;
+    spi_tx uut(clk, reset, data_in, cs, scl, sda, valid);
 
     initial begin
         clk = 0;
@@ -37,9 +37,9 @@ module spi_tb();
         #10;
         reset = 0;
         
-        onoff = 1;
+        cs = 0;
         #5000;
-        onoff = 0;
+        cs = 1;
         #1000;
         $finish;
     end
