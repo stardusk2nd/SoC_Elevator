@@ -58,6 +58,11 @@ module spi_tx_ip(
                     scl = 0;
                 end
             end
+            else begin
+                scl = 0;
+                count = 0;
+                sda_sampling = 0;
+            end
         end
     end
     
