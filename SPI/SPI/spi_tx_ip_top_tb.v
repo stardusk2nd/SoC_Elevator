@@ -27,7 +27,8 @@ module spi_tx_ip_top_tb();
     reg [9:0] control = 0;
     reg [7:0] data_in = 0;
     wire cs, dc, scl, sda;
-    spi_tx_ip_top uut(clk, reset, control, data_in, cs, dc, scl, sda);
+    wire valid;
+    spi_tx_ip_top uut(clk, reset, control, data_in, cs, dc, scl, sda, valid);
 
     initial begin
         clk = 0;
@@ -38,19 +39,20 @@ module spi_tx_ip_top_tb();
         #10;
         reset = 0;
         
-        control = 10'b0001_1010_0_0;
+        control = 10'b0001_1000_0_0;
+        
         data_in = 8'h11;
-        
         control[0] = 1;
-        #2000;
+        @(posedge valid);
+        #10;
         control[0] = 0;
-        #1000;
-        
+        #10;
         data_in = 8'h29;
         control[0] = 1;
-        #2000;
+        @(posedge valid);
+        #10;
         control[0] = 0;
-        #1000
+        #10
         
         $finish;
     end
