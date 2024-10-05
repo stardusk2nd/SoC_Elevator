@@ -35,15 +35,21 @@ module spi_tx_ip_top(
     wire [7:0] prescalor = control[9:2];    // prescalor for scl
     assign dc = data_mode;
     
+    wire enable_p;
+    edge_detector edge_detector_inst(
+        .clk(clk), .reset(reset),
+        .cp(enable),
+        .pedge(enable_p), .nedge()
+    );
+    
     /* spi module instane */
     spi_tx_ip spi_tx_ip_inst(clk, reset, data_in, prescalor, cs, scl, sda, valid);
     
     /* state machine control */
-    parameter IDLE      = 0;
-    parameter SEND_CMD  = 1;
-    parameter SEND_DATA = 2;
+    parameter IDLE  = 0;
+    parameter SEND  = 1;
     
-    reg [1:0] state, nxt_state;
+    reg state, nxt_state;
     always @(negedge clk, posedge reset) begin
         if(reset)
             state = IDLE;
@@ -61,31 +67,14 @@ module spi_tx_ip_top(
             case(nxt_state)
                 IDLE: begin
                     // communication start
-                    if(enable) begin
-                        if(!data_mode)
-                            nxt_state = SEND_CMD;
-                        else
-                            nxt_state = SEND_DATA;
+                    if(enable_p) begin
+                        nxt_state = SEND;
                     end
                 end
-                // Vitis: single transmission
-                SEND_CMD: begin
+                SEND: begin
                     if(valid) begin
                         cs = 1;
                         nxt_state = IDLE;
-                    end
-                    else
-                        cs = 0;
-                end
-                // Vitis: multiple transmission fuction needed
-                SEND_DATA: begin
-                    if(valid) begin
-                        if(enable)
-                            nxt_state = SEND_DATA;
-                        else begin
-                            cs = 1;
-                            nxt_state = IDLE;
-                        end
                     end
                     else
                         cs = 0;
