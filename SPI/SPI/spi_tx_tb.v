@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2024/09/14 14:00:24
+// Create Date: 2024/09/14 00:45:34
 // Design Name: 
-// Module Name: spi_test_tb
+// Module Name: scl_tb
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,32 +20,28 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module spi_test_tb();
-    
-    reg clk, reset;
-    reg [3:0] btn = 0;
-    wire cs, scl, sda, dc;
-    spi_test uut(clk, reset, btn, cs, scl, sda, dc);
-    
+module spi_tx_tb();
+
+    reg clk, reset, cs;
+    reg [7:0] data_in = 8'b11100010;
+    wire scl, sda, valid;
+    spi_tx uut(clk, reset, data_in, cs, scl, sda, valid);
+
     initial begin
         clk = 0;
         forever #5 clk = ~clk;
     end
     
-    integer i;
     initial begin
         reset = 1;
         #10;
         reset = 0;
         
-        for(i = 0; i < 4; i = i + 1) begin
-            btn[i] = 1;
-            #10;
-            btn[i] = 0;
-            #10000;
-        end
-        
+        cs = 0;
+        #5000;
+        cs = 1;
+        #1000;
         $finish;
     end
-    
+
 endmodule
