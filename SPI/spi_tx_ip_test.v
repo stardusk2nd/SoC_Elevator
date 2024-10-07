@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2024/09/14 12:18:46
+// Create Date: 2024/10/03 11:45:33
 // Design Name: 
-// Module Name: spi_test
+// Module Name: spi_tx_ip_test
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module spi_tx_test(
+module spi_tx_ip_test(
     input clk, reset,
     input [3:0] btn,
     output scl, sda,
@@ -28,9 +28,10 @@ module spi_tx_test(
     );
     
     reg [7:0] data_in;
+    reg [7:0] prescalor = 9;
     wire valid;
-    spi_tx spi_inst(
-        clk, reset, data_in, cs, scl, sda, valid
+    spi_tx_ip spi_inst(
+        clk, reset, data_in, prescalor, cs, scl, sda, valid
     );
     
     parameter IDLE          = 0,
@@ -227,4 +228,5 @@ module spi_tx_test(
             endcase
         end
     end
+    
 endmodule

@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2024/09/13 23:45:28
+// Create Date: 2024/09/15 16:19:13
 // Design Name: 
-// Module Name: spi
+// Module Name: spi_lcd
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,24 +20,18 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-`include "defines.vh"
-
-module spi_tx(
+module spi_tx_ip(
     input clk, reset,
-    input [7:0] data_in,// 1-byte data to send
-    input cs,           // on/off control signal (active-low)
-    output reg scl,     // spi clock pin
-    output reg sda,     // spi data pin (tx, master to slave)
-    output reg valid    // end of communication signal
+    input [7:0] data_in,    // 1-byte data to send
+    input [7:0] prescalor,  // prescalor for scl clock generating
+    input cs,               // on/off control signal (active-low)
+    output reg scl,         // spi clock pin
+    output reg sda,         // spi data pin (tx, master to slave)
+    output reg valid        // end of communication signal
     );
     
-    parameter SCL_FREQ = 15_000_000;                    // frequency of scl: 15MHz
-    parameter integer SCL_PSC = `CLK_FREQ / SCL_FREQ;   // prescaler for clock divider, generating 'scl'
-    
-    /* Generate 'SCL_FREQ'Hz SCL
-       cpol(phase) = 0, cpha(polarity) = 0 */
-    // width of count, for clock divider
-    reg [$clog2(SCL_PSC)-1 : 0] count;
+    // count for clock divider
+    reg [7:0] count;
     // timing for loading the data_in onto the sda, one bit at a time
     reg sda_sampling;
     always @(posedge clk, posedge reset) begin
@@ -48,13 +42,13 @@ module spi_tx(
         end
         else begin
             if(!cs) begin
-                if(count < SCL_PSC - 1) begin
+                if(count < prescalor) begin
                     count = count + 1;
-                    if(count < SCL_PSC / 2)
+                    if(count <= prescalor >> 1)
                         scl = 0;
                     else
                         scl = 1;
-                    if(count == SCL_PSC / 4)
+                    if(count == prescalor >> 2)
                         sda_sampling = 1;
                     else
                         sda_sampling = 0;
@@ -64,8 +58,19 @@ module spi_tx(
                     scl = 0;
                 end
             end
+            else begin
+                scl = 0;
+                count = 0;
+                sda_sampling = 0;
+            end
         end
     end
+    
+    wire scl_p;
+    edge_detector edge_detector_inst(
+        .clk(clk), .reset(reset), .cp(scl),
+        .pedge(scl_p), .nedge()
+    );
     
     /* send 1-byte */
     reg [2:0] index;
@@ -92,7 +97,7 @@ module spi_tx(
                 end
             end
             // wait until last bit sended
-            if(waiting && count == 3 * SCL_PSC / 4) begin
+            if(waiting && count == scl_p) begin
                 waiting = 0;
                 valid = 1;
             end

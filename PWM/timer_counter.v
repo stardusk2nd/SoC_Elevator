@@ -20,6 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
+<<<<<<< HEAD
 //module timer_counter_x4(
 //    input wire [1:0] control0,
 //    input wire [31:0] prescalor0, max_count0, compare0,
@@ -197,13 +198,19 @@
     
 //endmodule
 
+=======
+>>>>>>> e8dcf67e362838e082719eecc5e03d93dba935f3
 module timer_counter(
     input clk, reset,
     input [1:0] control,
     input [31:0] prescalor,
     input [31:0] max_count,
     input [31:0] compare,
+<<<<<<< HEAD
     output reg int, pwm
+=======
+    output reg timer_int, pwm
+>>>>>>> e8dcf67e362838e082719eecc5e03d93dba935f3
     );
     
     wire [1:0] mode = control[1:0];
@@ -214,7 +221,11 @@ module timer_counter(
         if(reset) begin
             cnt_pres = 0;
             count = 0;
+<<<<<<< HEAD
             int = 0;
+=======
+            timer_int = 0;
+>>>>>>> e8dcf67e362838e082719eecc5e03d93dba935f3
             pwm = 0;
             prev_mode = 0;
         end
@@ -222,11 +233,19 @@ module timer_counter(
             if(prev_mode != mode) begin
                 cnt_pres = 0;
                 count = 0;
+<<<<<<< HEAD
                 int = 0;
                 pwm = 0;
                 prev_mode = mode;
             end
             // int
+=======
+                timer_int = 0;
+                pwm = 0;
+                prev_mode = mode;
+            end
+            // timer_int
+>>>>>>> e8dcf67e362838e082719eecc5e03d93dba935f3
             if(mode == 2'b01) begin
                 if(cnt_pres < prescalor)
                     cnt_pres = cnt_pres + 1;     
@@ -234,11 +253,19 @@ module timer_counter(
                     cnt_pres = 0;
                     if(count < max_count) begin
                         count = count + 1;
+<<<<<<< HEAD
                         int = 0;
                     end
                     else begin
                         count = 0;
                         int = 1;
+=======
+                        timer_int = 0;
+                    end
+                    else begin
+                        count = 0;
+                        timer_int = 1;
+>>>>>>> e8dcf67e362838e082719eecc5e03d93dba935f3
                     end
                 end
             end           
