@@ -2,11 +2,10 @@
 
 bool direction = false;		// motor direction
 bool start = false;			// motor start
-uint8_t cur_floor = 2;
-uint8_t target_floor = 1;
-uint8_t i = 0;
+uint8_t CurrentFloor = 1;
+uint8_t TargetFloor = 1;
 
-void RotateStep(){
+void RotateStep(uint8_t i){
 	if(!direction){
 		XGpio_DiscreteWrite(&gpio_instance0, MOTOR_CH, 0b0001 << i);	// down stair
 	}
@@ -16,9 +15,9 @@ void RotateStep(){
 }
 
 void CheckFloor(){
-	if(cur_floor != target_floor){
+	if(CurrentFloor != TargetFloor){
 		start = true;
-		if(cur_floor < target_floor){
+		if(CurrentFloor < TargetFloor){
 			direction = 1;
 		}
 		else{
