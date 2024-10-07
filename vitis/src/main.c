@@ -46,8 +46,8 @@
  */
 
 
-#include "functions.h"
 #include "int.h"
+#include "motor.h"
 #include "spi.h"
 #include "spi_lcd.h"
 
@@ -58,19 +58,18 @@
 #define BTN_ID			XPAR_BUTTON_DEVICE_ID
 #define PHOTO_ID		XPAR_PHOTO_INTERRUPTER_DEVICE_ID
 
-/* custom ip register address */
 #define SPI_BASEADDR 	XPAR_SPI_TX_0_S00_AXI_BASEADDR
-
-/* register init */
-volatile unsigned int *spi_register = (volatile unsigned int *) SPI_BASEADDR;
-volatile uint32_t *tim_reg = (volatile uint32_t *) TIMER_BASEADDR;
-
-bool PrintFlag = false;
-bool ArrowFlag = false;
 
 XGpio gpio_instance0;	// motor
 XGpio gpio_instance1;	// btn
 XGpio gpio_instance2;	// photo
+
+/* custom ip's register address */
+volatile uint32_t *spi_register = (volatile uint32_t *) SPI_BASEADDR;
+volatile uint32_t *tim_reg = (volatile uint32_t *) TIMER_BASEADDR;
+
+bool PrintFlag = false;
+bool ArrowFlag = false;
 
 extern bool direction;
 extern bool start;
@@ -93,8 +92,10 @@ int main()
 	XGpio_SetDataDirection(&gpio_instance1, BTN_CH, 0b1111);	// button input
 	XGpio_SetDataDirection(&gpio_instance2, PHOTO_CH, 0b111);	// photo interrupt input
 
-	/* init */
+	/* interrupt init */
 	IntInit();
+
+	/* spi lcd module init */
 	SpiLcdInit();
 
     /* timer/counter register init */
@@ -102,13 +103,16 @@ int main()
 	tim_reg[1] = 999;	// prescalor
 	tim_reg[2] = 199;	// max count value
 
+	// set the 'PrintFlag' to print out current floor, when system's rebooted
 	PrintFlag = true;
 
     while(1){
+    	// print current floor
     	if(PrintFlag){
     		PrintCurFloor(CurrentFloor);
     		PrintFlag = false;
     	}
+    	// print arrow
     	if(ArrowFlag){
     		PrintArrow(direction, start);
     		ArrowFlag = false;

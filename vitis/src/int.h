@@ -1,5 +1,5 @@
 #include "top.h"
-#include "functions.h"
+#include "motor.h"
 #include "spi_lcd.h"
 
 /* interrupt ID */
@@ -16,8 +16,12 @@ void BTN_ISR(void *CallBackRef);
 void PHOTO_ISR(void *CallBackRef);
 void IntInit();
 
+extern XGpio gpio_instance1;	// btn
+extern XGpio gpio_instance2;	// photo
+
 extern uint8_t CurrentFloor;
 extern uint8_t TargetFloor;
+extern bool start;
 extern bool TxDone;
 extern bool ArrowFlag;
 extern bool PrintFlag;

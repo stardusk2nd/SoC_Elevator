@@ -1,4 +1,4 @@
-#include "functions.h"
+#include "motor.h"
 
 bool direction = false;		// motor direction
 bool start = false;			// motor start
@@ -18,10 +18,10 @@ void CheckFloor(){
 	if(CurrentFloor != TargetFloor){
 		start = true;
 		if(CurrentFloor < TargetFloor){
-			direction = 1;
+			direction = UP;
 		}
 		else{
-			direction = 0;
+			direction = DOWN;
 		}
 	}
 	else

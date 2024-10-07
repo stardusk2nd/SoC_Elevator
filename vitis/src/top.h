@@ -7,13 +7,6 @@
 #include "xil_exception.h"
 #include "stdbool.h"
 
-/* define variable */
-#define MOTOR_CH 		1
-#define BTN_CH 			1
-#define PHOTO_CH 		1
-
-extern XGpio gpio_instance0;	// motor
-extern XGpio gpio_instance1;	// btn
-extern XGpio gpio_instance2;	// photo
-extern bool start;
-extern uint8_t i;
+// define direction
+#define UP 		1
+#define DOWN 	0

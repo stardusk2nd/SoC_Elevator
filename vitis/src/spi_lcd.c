@@ -1,26 +1,38 @@
 #include "spi_lcd.h"
 
 void SpiLcdInit(){
-    // set prescalor as 9(10-1)
-    CONTROL = 0b0000100100;
+    /* 9-2nd bit: set prescalor as 9(10-1)
+	   1st bit: set dc as low(command mode)
+       0th bit: set cs as high(spi module off) */
+	CONTROL = 0b0000100100;
 
+	// soft reset
+	SendCommand(0x01);
+	// sleep out
     SendCommand(0x11);
+    // display on
     SendCommand(0x29);
+    // RGB format setting (as RGB: 5/6/5 bit)
     SendCommand(0x3a);
     SendData(0x55);
 
 	unsigned int i = 0;
+	// memory write
 	SendCommand(0x2c);
+	// fill entire display(320x240) with black color(RGB: 0/0/0)
+	// black: background / white: letter
 	for(i = 0; i < 153600; i++){
 		SendData(0x00);
 	}
 }
 
+/* functions for printing arrow */
 void PrintArrow(bool Direction, bool Start){
+	// print out only when the elevator is moving
 	if(!Start)
 		Stop();
 	else{
-		if(Direction)
+		if(Direction == UP)
 			UpArrow();
 		else
 			DownArrow();
@@ -28,12 +40,16 @@ void PrintArrow(bool Direction, bool Start){
 }
 void UpArrow(){
 	for(uint8_t j=0; j<50; j+=10){
+		// column addr. set
 		SendCommand(0x2a);
+		// start addr.
 		SendData(0x00);
 		SendData(140 - j);
+		// end addr.
 		SendData(0x00);
 		SendData(149 - j);
 
+		// page addr. set
 		SendCommand(0x2b);
 		SendData(0x00);
 		SendData(40 + j);
@@ -88,6 +104,7 @@ void Stop(){
 	}
 }
 
+/* functions for printing seven segment */
 void PrintCurFloor(uint8_t CurFloor){
 	switch(CurFloor){
 		case 1:
