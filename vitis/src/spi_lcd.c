@@ -142,15 +142,17 @@ void PrintCurFloor(uint8_t CurFloor){
 void Iteration(bool OnOff){
     uint16_t i = 0;
     SendCommand(0x2c);
-    for(i=0; i<850; i++){
-    	if(OnOff){
-    		SendData(0x00);
-    		SendData(0b00011111);
-    	}
-    	else{
-    		SendData(0x00);
-    	}
+    if(OnOff){
+		for(i=0; i<850; i++){
+			SendData(0x00);
+			SendData(0b00011111);
+		}
     }
+	else{
+		for(i=0; i<1700; i++){
+			SendData(0x00);
+		}
+	}
 }
 
 void SetA(bool OnOff){
