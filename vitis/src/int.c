@@ -32,7 +32,9 @@ void BTN_ISR(void *CallBackRef){
 	else if(btn_state == 0b0100){
 		TargetFloor = 3;		// 3F
 	}
-
+	else if(btn_state & (1 << 3)){
+		PwmFlag = true;
+	}
 	ArrowFlag = true;
 	CheckFloor();
 

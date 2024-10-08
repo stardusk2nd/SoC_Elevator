@@ -52,6 +52,7 @@
 #include "spi_lcd.h"
 
 #define TIMER_BASEADDR 	XPAR_MYIP_TIMER_COUNTER_0_S00_AXI_BASEADDR
+#define PWM_BASEADDR	XPAR_LED_PWM_S00_AXI_BASEADDR
 
 #define TIMER_ID 		XPAR_MYIP_TIMER_COUNTER_0_DEVICE_ID
 #define MOTOR_ID 		XPAR_STEPPING_MOTOR_DEVICE_ID
@@ -67,9 +68,12 @@ XGpio gpio_instance2;	// photo
 /* custom ip's register address */
 volatile uint32_t *spi_register = (volatile uint32_t *) SPI_BASEADDR;
 volatile uint32_t *tim_reg = (volatile uint32_t *) TIMER_BASEADDR;
+volatile uint32_t *pwm_reg = (volatile uint32_t *) PWM_BASEADDR;
 
 bool PrintFlag = false;
 bool ArrowFlag = false;
+bool PwmFlag = false;
+uint8_t LedState = 0;
 
 extern bool direction;
 extern bool start;
@@ -103,6 +107,13 @@ int main()
 	tim_reg[1] = 999;	// prescalor
 	tim_reg[2] = 199;	// max count value
 
+	/* timer/counter - pwm mode register init */
+	// target frequency = 1kHz
+	pwm_reg[0] = 0b10;
+	pwm_reg[1] = 100 - 1;
+	pwm_reg[2] = 1000 - 1;
+	pwm_reg[3] = 1000;
+
 	// set the 'PrintFlag' to print out current floor, when system's rebooted
 	PrintFlag = true;
 
@@ -116,6 +127,21 @@ int main()
     	if(ArrowFlag){
     		PrintArrow(direction, start);
     		ArrowFlag = false;
+    	}
+    	if(PwmFlag){
+    		if(LedState < 3){
+    			LedState++;
+    		}
+    		else{
+    			LedState = 0;
+    		}
+			switch(LedState){
+			case 0: pwm_reg[3] = 1000; break;
+			case 1: pwm_reg[3] = 667; break;
+			case 2: pwm_reg[3] = 333; break;
+			case 3: pwm_reg[3] = 0; break;
+			}
+    		PwmFlag = false;
     	}
     }
 
