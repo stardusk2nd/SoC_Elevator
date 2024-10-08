@@ -57,8 +57,9 @@ void UpArrow(){
 		SendData(129 - j);
 
 		SendCommand(0x2c);
-		for(uint16_t i=0; i<1800-40*j; i++){
-			SendData(0xff);
+		for(uint16_t i=0; i<900-20*j; i++){
+			SendData(0x00);
+			SendData(0b00011111);
 		}
 	}
 
@@ -78,8 +79,9 @@ void DownArrow(){
 		SendData(129 - j);
 
 		SendCommand(0x2c);
-		for(uint16_t i=0; i<1800-40*j; i++){
-			SendData(0xff);
+		for(uint16_t i=0; i<900-20*j; i++){
+			SendData(0x00);
+			SendData(0b00011111);
 		}
 	}
 }
@@ -140,11 +142,14 @@ void PrintCurFloor(uint8_t CurFloor){
 void Iteration(bool OnOff){
     uint16_t i = 0;
     SendCommand(0x2c);
-    for(i=0; i<1700; i++){
-    	if(OnOff)
-    		SendData(0xff);
-    	else
+    for(i=0; i<850; i++){
+    	if(OnOff){
     		SendData(0x00);
+    		SendData(0b00011111);
+    	}
+    	else{
+    		SendData(0x00);
+    	}
     }
 }
 
