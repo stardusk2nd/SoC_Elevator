@@ -35,7 +35,7 @@ module spi_tx(
     parameter integer SCL_PSC = `CLK_FREQ / SCL_FREQ;   // prescaler for clock divider, generating 'scl'
     
     /* Generate 'SCL_FREQ'Hz SCL
-       cpol(phase) = 0, cpha(polarity) = 0 */
+       cpol(polarity) = 0, cpha(phase) = 0 */
     // width of count, for clock divider
     reg [$clog2(SCL_PSC)-1 : 0] count;
     // timing for loading the data_in onto the sda, one bit at a time
