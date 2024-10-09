@@ -28,10 +28,10 @@ module spi_tx_ip_test(
     );
     
     reg [7:0] data_in;
-    reg [7:0] prescalor = 9;
+    reg [7:0] prescaler = 9;
     wire valid;
     spi_tx_ip spi_inst(
-        clk, reset, data_in, prescalor, cs, scl, sda, valid
+        clk, reset, data_in, prescaler, cs, scl, sda, valid
     );
     
     parameter IDLE          = 0,

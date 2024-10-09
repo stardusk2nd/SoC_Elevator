@@ -32,7 +32,7 @@ module spi_tx_ip_top(
     /* control register */
     wire enable          = control[0];      // communication on-off
     wire data_mode       = control[1];      // data or command selection. 0: com, 1: data
-    wire [7:0] prescalor = control[9:2];    // prescalor for scl
+    wire [7:0] prescaler = control[9:2];    // prescaler for scl
     assign dc = data_mode;
     
     wire enable_p;
@@ -43,7 +43,7 @@ module spi_tx_ip_top(
     );
     
     /* spi module instane */
-    spi_tx_ip spi_tx_ip_inst(clk, reset, data_in, prescalor, cs, scl, sda, valid);
+    spi_tx_ip spi_tx_ip_inst(clk, reset, data_in, prescaler, cs, scl, sda, valid);
     
     /* state machine control */
     parameter IDLE  = 0;

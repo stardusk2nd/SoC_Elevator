@@ -23,7 +23,7 @@
 module spi_tx_ip(
     input clk, reset,
     input [7:0] data_in,    // 1-byte data to send
-    input [7:0] prescalor,  // prescalor for scl clock generating
+    input [7:0] prescaler,  // prescaler for scl clock generating
     input cs,               // on/off control signal (active-low)
     output reg scl,         // spi clock pin
     output reg sda,         // spi data pin (tx, master to slave)
@@ -42,13 +42,13 @@ module spi_tx_ip(
         end
         else begin
             if(!cs) begin
-                if(count < prescalor) begin
+                if(count < prescaler) begin
                     count = count + 1;
-                    if(count <= prescalor >> 1)
+                    if(count <= prescaler >> 1)
                         scl = 0;
                     else
                         scl = 1;
-                    if(count == prescalor >> 2)
+                    if(count == prescaler >> 2)
                         sda_sampling = 1;
                     else
                         sda_sampling = 0;
