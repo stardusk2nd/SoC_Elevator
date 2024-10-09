@@ -81,7 +81,7 @@ module spi_tx(
         else if(valid)
             valid = 0;
         else begin
-            // send 1-bit at 'sda_sampling'
+            // load 1-bit at 'sda_sampling'
             if(!cs && sda_sampling) begin
                 sda = data_in[index];
                 if(index > 0)
