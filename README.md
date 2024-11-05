@@ -1,4 +1,5 @@
 # MicroBlaze Elevator Project
+![IMG_0687](https://github.com/user-attachments/assets/bfb5f135-7227-4a37-9ca3-68178dc8af06)
 
 [Report Link](https://1drv.ms/p/s!AoW7lidA8JGFkz9k9F2kqPBoKqji?e=Tnz3dz)
 
