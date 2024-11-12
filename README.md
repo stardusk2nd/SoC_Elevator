@@ -1,7 +1,7 @@
 # MicroBlaze Elevator Project
 <img src="https://github.com/user-attachments/assets/bfb5f135-7227-4a37-9ca3-68178dc8af06" width="400" height="600"/>
 
-[Report Link](https://1drv.ms/p/s!AoW7lidA8JGFkz9k9F2kqPBoKqji?e=Tnz3dz)
+[Report Link](https://1drv.ms/b/s!AoW7lidA8JGFk01fsiFiAZpiQz6v?e=7zcrt4)
 
 **※ Please refer to the link above for more information. (written in Korean)**
 
